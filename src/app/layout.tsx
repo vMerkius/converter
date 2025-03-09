@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/theme/theme-provider";
+import Providers from "@/providers/providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,14 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex justify-center items-center h-screen">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
