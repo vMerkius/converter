@@ -10,11 +10,36 @@ import { useState } from "react";
 import { IUserFormats } from "@/types/user-formats";
 import Help from "@/components/home/help";
 import Theme from "@/components/ui/theme";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { convertFile } from "@/server/api";
+import { useTheme } from "next-themes";
 
 export default function Home() {
+  const { theme } = useTheme();
   const [userFormatsChoice, setUserFormatsChoice] = useState<IUserFormats>({
-    from: "docx",
+    from: "png",
     to: "pdf",
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+
+  const { mutate, isPending, isError, data } = useMutation({
+    mutationFn: async () => {
+      if (!selectedFile) {
+        throw new Error("No file selected");
+      }
+      return await convertFile(
+        selectedFile,
+        userFormatsChoice.from,
+        userFormatsChoice.to
+      );
+    },
+    onSuccess: (blob) => {
+      const url = URL.createObjectURL(
+        new Blob([blob], { type: "application/pdf" })
+      );
+      setDownloadUrl(url);
+    },
   });
 
   return (
@@ -30,15 +55,30 @@ export default function Home() {
         setUserFormats={setUserFormatsChoice}
       />
       <div>
-        <InputFile />
+        <InputFile handleFileChange={setSelectedFile} />
       </div>
-      <Button>Convert</Button>
-      <Image
-        src="/assets/icons/icon-file-download.svg"
-        alt="Add icon"
-        width={35}
-        height={35}
-      />
+      <Button onClick={() => mutate()} disabled={isPending || !selectedFile}>
+        {isPending ? "Converting..." : "Convert"}
+      </Button>
+      {downloadUrl && (
+        <a
+          href={downloadUrl}
+          download="converted.pdf"
+          className="flex flex-col items-center gap-2"
+        >
+          <Image
+            src={
+              theme === "light"
+                ? "/assets/icons/icon-file-download-light.svg"
+                : "/assets/icons/icon-file-download.svg"
+            }
+            alt="Download"
+            width={35}
+            height={35}
+          />
+          <span className="underline">Download</span>
+        </a>
+      )}
     </div>
   );
 }

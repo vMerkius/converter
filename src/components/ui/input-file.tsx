@@ -3,13 +3,23 @@ import { Label } from "@/components/ui/label";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 
-export function InputFile() {
+type InputFileProps = {
+  handleFileChange: (file: File | null) => void;
+};
+
+export const InputFile: React.FC<InputFileProps> = ({ handleFileChange }) => {
   const { theme } = useTheme();
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    handleFileChange(file);
+  };
+
   return (
     <div className="grid max-w-sm items-center gap-1.5 relative">
       <Label htmlFor="picture">Drop a file or choose manually</Label>
       <div className="relative">
-        <Input id="picture" type="file" />
+        <Input id="picture" type="file" onChange={onFileChange} />
         <Image
           src={`${
             theme === "light"
@@ -24,4 +34,4 @@ export function InputFile() {
       </div>
     </div>
   );
-}
+};
