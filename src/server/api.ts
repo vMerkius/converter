@@ -7,8 +7,6 @@ const convertFile = async (
   from: string,
   to: string
 ): Promise<Blob> => {
-  console.log("Wysyłanie pliku do API:", `${URL}/convert`);
-
   const formData = new FormData();
   formData.append("file", file);
 
@@ -23,10 +21,17 @@ const convertFile = async (
         responseType: "blob",
       }
     );
-
-    console.log("Plik skonwertowany:", response);
     return response.data;
-  } catch (err) {
+  } catch (err: any) {
+    if (
+      err.response &&
+      err.response.data instanceof Blob &&
+      err.response.data.type === "application/json"
+    ) {
+      const text = await err.response.data.text();
+      const json = JSON.parse(text);
+      throw new Error(json.message || "File conversion failed");
+    }
     console.error("Błąd podczas konwersji pliku:", err);
     throw err;
   }

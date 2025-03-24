@@ -10,9 +10,10 @@ import { useState } from "react";
 import { IUserFormats } from "@/types/user-formats";
 import Help from "@/components/home/help";
 import Theme from "@/components/ui/theme";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { convertFile } from "@/server/api";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 
 export default function Home() {
   const { theme } = useTheme();
@@ -35,10 +36,23 @@ export default function Home() {
       );
     },
     onSuccess: (blob) => {
-      const url = URL.createObjectURL(
-        new Blob([blob], { type: "application/pdf" })
-      );
+      const mimeTypes: Record<string, string> = {
+        pdf: "application/pdf",
+        png: "image/png",
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+      };
+      const mimeType =
+        mimeTypes[userFormatsChoice.to] || "application/octet-stream";
+
+      const url = URL.createObjectURL(new Blob([blob], { type: mimeType }));
       setDownloadUrl(url);
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Oops! Something went wrong", {
+        description: error.message,
+      });
     },
   });
 
@@ -63,7 +77,7 @@ export default function Home() {
       {downloadUrl && (
         <a
           href={downloadUrl}
-          download="converted.pdf"
+          download={`converted.${userFormatsChoice.to}`}
           className="flex flex-col items-center gap-2"
         >
           <Image

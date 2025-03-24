@@ -1,4 +1,3 @@
-import SelectOptions from "@/constans/select-options";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -13,12 +12,14 @@ type FormatProps = {
   userFormats: IUserFormats;
   setUserFormats: React.Dispatch<React.SetStateAction<IUserFormats>>;
   option?: "from" | "to";
+  selectOptions: string[];
 };
 
 const Format: React.FC<FormatProps> = ({
   userFormats,
   setUserFormats,
   option = "from",
+  selectOptions,
 }) => {
   const handleChange = (value: string) => {
     setUserFormats((prev) => ({
@@ -34,7 +35,7 @@ const Format: React.FC<FormatProps> = ({
           <SelectValue placeholder="Format" />
         </SelectTrigger>
         <SelectContent>
-          {SelectOptions.map((option) => (
+          {selectOptions.map((option) => (
             <SelectItem key={option} value={option}>
               {option}
             </SelectItem>
