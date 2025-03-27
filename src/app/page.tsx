@@ -14,6 +14,9 @@ import { useMutation } from "@tanstack/react-query";
 import { convertFile } from "@/server/api";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
+import Modal from "@/components/ui/modal";
+import LoginForm from "@/components/forms/login";
+import RegisterForm from "@/components/forms/register";
 
 export default function Home() {
   const { theme } = useTheme();
@@ -23,6 +26,8 @@ export default function Home() {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formType, setFormType] = useState<"login" | "register">("login");
 
   const { mutate, isPending, isError, data } = useMutation({
     mutationFn: async () => {
@@ -56,12 +61,32 @@ export default function Home() {
     },
   });
 
+  const renderForm = () => {
+    switch (formType) {
+      case "login":
+        return <LoginForm switchToRegister={() => setFormType("register")} />;
+      case "register":
+        return <RegisterForm switchToLogin={() => setFormType("login")} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center gap-8">
-      <div className="absolute right-20 top-5">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {renderForm()}
+      </Modal>
+      <div className="absolute right-5 top-5 flex gap-5">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setIsModalOpen(true);
+          }}
+        >
+          Login
+        </Button>
         <Theme />
-      </div>
-      <div className="absolute right-5 top-5">
         <Help />
       </div>
       <Formats

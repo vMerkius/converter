@@ -18,6 +18,7 @@ export default function RootLayout({
       <body className="flex justify-center items-center h-screen">
         <Providers>{children}</Providers>
         <Toaster />
+        <div id="modal-root"></div>
       </body>
     </html>
   );
