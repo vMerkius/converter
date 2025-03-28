@@ -42,7 +42,7 @@ const Modal: React.FC<ModalProps> = ({ children, isOpen, onClose }) => {
   }, [isOpen, onClose]);
 
   const modalBgClass =
-    theme === "dark" ? "bg-indigo-500 text-white" : "bg-indigo-100 text-black";
+    theme === "dark" ? "bg-indigo-500 text-white" : "bg-gray-400 text-black";
 
   if (!mounted || !isOpen) return null;
 
